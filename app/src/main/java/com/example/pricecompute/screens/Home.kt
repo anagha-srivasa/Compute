@@ -1,6 +1,8 @@
-package com.example.pricecompute.Screens
+package com.example.pricecompute.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,9 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -21,11 +27,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.pricecompute.model.MachineConfig
 import com.example.pricecompute.model.Plan
+import com.example.pricecompute.ui.theme.PriceComputeTheme
 
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onUpgradeClick: () -> Unit = {},
+    onFabClick: () -> Unit = {}
 ) {
     Column(modifier=modifier.fillMaxSize(),verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally){
@@ -46,31 +56,46 @@ fun HomeScreen(
             ) {
                 Text(text = "Current Plan", style = MaterialTheme.typography.headlineSmall)
                 Spacer(modifier = modifier.height(16.dp))
+
+                Column(verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(text = MachineConfig.currentMachine.machineName,style = MaterialTheme.typography.headlineMedium)
+                    Text(text = MachineConfig.currentMachine.desc,style = MaterialTheme.typography.headlineMedium)
+                }
+
+                Spacer(modifier = modifier.height(16.dp))
+
                 Row {
                     Text(
-                        text = "RAM: ${Plan.currentPlan.cpuLimit}",
+                        text = "RAM: ${MachineConfig.currentMachine.plan.cpuLimit}GB",
                         style = MaterialTheme.typography.headlineMedium,
                         modifier = modifier.padding(start = 16.dp)
                     )
-                    Spacer(modifier = Modifier.width(100.dp))
+                    Spacer(modifier = Modifier.width(80.dp))
                     Text(
-                        text = "GPU: ${Plan.currentPlan.gpuLimit}",
+                        text = "GPU: ${MachineConfig.currentMachine.plan.gpuLimit}",
                         style = MaterialTheme.typography.headlineMedium
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
-                Row {
+                Row(modifier = modifier.padding(bottom = 16.dp)) {
                     Text(
-                        text = "SSD: ${Plan.currentPlan.ssd}",
+                        text = "SSD: ${MachineConfig.currentMachine.plan.ssd}GB",
                         style = MaterialTheme.typography.headlineMedium,
                         modifier = modifier.padding(start = 16.dp)
                     )
-                    Spacer(modifier = Modifier.width(100.dp))
+                    Spacer(modifier = Modifier.width(70.dp))
                     Text(
-                        text = "HDD: ${Plan.currentPlan.hdd}",
+                        text = "HDD: ${MachineConfig.currentMachine.plan.hdd}",
                         style = MaterialTheme.typography.headlineMedium
                     )
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
+
+                Text(
+                    text = "expiry: ${MachineConfig.currentMachine.plan.expiryDate}",
+                    style = MaterialTheme.typography.headlineSmall
+                )
             }
         }
 
@@ -80,14 +105,21 @@ fun HomeScreen(
             verticalArrangement = Arrangement.Center
         ) {
             OutlinedButton(
-                onClick = { /*TODO*/ }, colors = ButtonDefaults.outlinedButtonColors(
+                onClick = { onUpgradeClick() }, colors = ButtonDefaults.outlinedButtonColors(
                     containerColor = Color(27, 41, 64),
-                    contentColor = Color.Black
+                    contentColor = Color.White
                 )
             ) {
                 Text(text = "Upgrade plan", style = MaterialTheme.typography.headlineMedium)
             }
-
+            OutlinedButton(
+                onClick = { onFabClick() }, colors = ButtonDefaults.outlinedButtonColors(
+                    containerColor = Color(27, 41, 64),
+                    contentColor = Color.White
+                )
+            ) {
+                Text(text = "Ask AI assistant", style = MaterialTheme.typography.headlineMedium)
+            }
         }
     }
 }
@@ -95,5 +127,7 @@ fun HomeScreen(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun Home() {
-    HomeScreen()
+    PriceComputeTheme{
+        HomeScreen()
+    }
 }
