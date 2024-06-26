@@ -1,7 +1,5 @@
 package com.example.pricecompute.model
 
-import android.text.format.Time
-import java.text.SimpleDateFormat
 import java.time.LocalDate
 
 data class Plan(
@@ -9,6 +7,6 @@ data class Plan(
     val gpuLimit: Int?,
     val ssd:Int?,
     val hdd:Int?,
-    val expiryDate: LocalDate = LocalDate.now(),
-    var isExpired: Boolean = LocalDate.now() > expiryDate
+    var expiryDate: LocalDate = LocalDate.now(),
+    val isExpired: Boolean = LocalDate.now() > expiryDate
 )

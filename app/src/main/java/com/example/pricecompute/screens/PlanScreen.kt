@@ -1,5 +1,6 @@
 package com.example.pricecompute.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,12 +33,12 @@ import com.example.pricecompute.model.MachineConfig
 import com.example.pricecompute.model.Plan
 import com.example.pricecompute.ui.theme.PriceComputeTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PlanScreen(
     modifier: Modifier = Modifier,
     machineConfig: MachineConfig,
-    onBuyClick: () -> Unit = {}
+    onBuyClick: (Long) -> Unit = {},
+    discount:(Long)->Long = {0}
     ) {
 
     var duration by remember {
@@ -45,7 +46,7 @@ fun PlanScreen(
     }
     var buy by remember { mutableStateOf(false) }
 
-    Column(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.Center,
+    Column(modifier = modifier.fillMaxSize().background(Color.Black), verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally) {
 
         OutlinedCard(modifier = modifier
@@ -70,7 +71,7 @@ fun PlanScreen(
                     value =duration ,
                     onValueChange ={duration = it} ,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    label = {Text(text = "Duration in days")},
+                    label = {Text(text = "Duration in days", color = Color.White)},
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedTextColor = Color.White
                     )
@@ -84,9 +85,10 @@ fun PlanScreen(
                 }
 
                 if (buy) {
-                    Text(text = "Estimated price: ${machineConfig.price.times(duration.toLong())}")
+                    val price = machineConfig.price*24*duration.toLong() - (machineConfig.price*24*duration.toLong()*(discount(duration.toLong())/100))
+                    Text(text = "Estimated price: $price")
                     Spacer(modifier = modifier.height(16.dp))
-                    OutlinedButton(onClick = {onBuyClick()}) {
+                    OutlinedButton(onClick = {onBuyClick(duration.toLong())}) {
                         Text(text = "Buy", style = MaterialTheme.typography.titleMedium)
                     }
                 }
@@ -103,7 +105,7 @@ private fun PlanScreenPrev() {
             machineConfig = MachineConfig(
                 "EC2", "Virtual Servers in the Cloud", 0.023,
                 Plan(12, null, 128, 256)
-            ),
+            )
         )
     }
 }

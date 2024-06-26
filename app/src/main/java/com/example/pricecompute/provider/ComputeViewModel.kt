@@ -1,10 +1,5 @@
 package com.example.pricecompute.provider
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.pricecompute.model.MachineConfig
@@ -12,7 +7,6 @@ import com.example.pricecompute.screens.ai.ChatMessage
 import com.example.pricecompute.screens.ai.ChatUiState
 import com.example.pricecompute.screens.ai.Participant
 import com.google.ai.client.generativeai.GenerativeModel
-import com.google.ai.client.generativeai.type.GenerationConfig
 import com.google.ai.client.generativeai.type.generationConfig
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -86,6 +80,28 @@ class ComputeViewModel:ViewModel() {
 
     fun changePlan(machineConfig: MachineConfig){
         currentMachine.value = machineConfig
+    }
+    fun increaseDuration(days:Long){
+        currentMachine.value.plan.expiryDate.plusDays(days)
+    }
+    fun provideDiscount(duration:Long):Long{
+        when(duration){
+            in 0L .. 6L -> {
+                return 0
+            }
+            in 7L .. 13L -> {
+                return 5
+            }
+            in 14L .. 29L -> {
+                return 10
+            }
+            in 30 .. 179 -> {
+                return 15
+            }
+            else -> {
+                return 20
+            }
+        }
     }
 
 }
