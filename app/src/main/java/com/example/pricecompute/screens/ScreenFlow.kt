@@ -1,28 +1,25 @@
 package com.example.pricecompute.screens
 
 import android.widget.Toast
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.pricecompute.model.MachineConfig
 import com.example.pricecompute.provider.ComputeViewModel
+import com.example.pricecompute.provider.selectedMachine
+import com.example.pricecompute.screens.ai.ChatScreen
 
 
 @Composable
 fun ScreenFlow(
-    viewModel: ComputeViewModel = androidx.lifecycle.viewmodel.compose.viewModel()
+    viewModel: ComputeViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = ComputeViewModel.Factory)
 ){
     val navController = rememberNavController()
     val context = LocalContext.current
+    val currentMachine by viewModel.currentMachine.collectAsState()
     NavHost(navController = navController, startDestination = "home") {
         composable("home"){
                 HomeScreen(onUpgradeClick = {
@@ -30,32 +27,30 @@ fun ScreenFlow(
                 },
                     onFabClick = {
                         navController.navigate("ai")
-                    }
+                    },
+                    currentMachine = currentMachine
                 )
             }
 
         composable("upg"){
             UpgradeScreen(onMachineClick = {
-                MachineConfig.currentMachine = it
+                selectedMachine = it
                 navController.navigate("plan")
-            }
+            },
+                machineList = viewModel.machines
             )
         }
         composable("plan"){
             PlanScreen(
-                machineConfig = MachineConfig.currentMachine,
+                machine = selectedMachine,
                 onBuyClick = {
-                    viewModel.changePlan(MachineConfig.currentMachine)
-                    viewModel.increaseDuration(it)
+                    viewModel.changeMachine(it)
                     Toast.makeText(
                         context,
                         "Purchased",
                         Toast.LENGTH_SHORT
                     ).show()
                     navController.navigate("home")
-                },
-                discount = {
-                    viewModel.provideDiscount(it)
                 }
             )
         }
@@ -65,4 +60,5 @@ fun ScreenFlow(
 
     }
 }
+
 

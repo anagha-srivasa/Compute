@@ -15,18 +15,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.pricecompute.model.MachineConfig
+import com.example.pricecompute.model.Machine
+import com.example.pricecompute.provider.machineList
 import com.example.pricecompute.ui.theme.PriceComputeTheme
 
 @Composable
 fun UpgradeScreen(
     modifier: Modifier = Modifier,
-    onMachineClick: (MachineConfig) -> Unit = {}
+    onMachineClick: (Machine) -> Unit = {},
+    machineList: List<Machine>
 ) {
 
     LazyColumn(modifier=modifier.fillMaxSize().background(Color.Black)) {
-        items(MachineConfig.machineList){
-           MachineCard(machineConfig = it) {conf->
+        items(machineList){
+           MachineCard(machine = it) { conf->
                onMachineClick(conf)
            }
         }
@@ -36,16 +38,16 @@ fun UpgradeScreen(
 @Composable
 fun MachineCard(
     modifier: Modifier = Modifier,
-    machineConfig: MachineConfig,
-    onMachineClick: (MachineConfig) -> Unit
+    machine: Machine,
+    onMachineClick: (Machine) -> Unit
 ) {
     Column(modifier = modifier
         .padding(16.dp).background(Color.Black)
-        .clickable { onMachineClick(machineConfig) }) {
-        Text(text = machineConfig.machineName,style = MaterialTheme.typography.titleMedium, color = Color.White)
-        Text(text = machineConfig.desc,style = MaterialTheme.typography.titleMedium, color = Color.White)
-        Text(text = "price: ${machineConfig.price} per hour",style = MaterialTheme.typography.titleMedium, color = Color.White)
-        Text(text = "CPU:${machineConfig.plan.cpuLimit}  GPU:${machineConfig.plan.gpuLimit}  SSD:${machineConfig.plan.ssd}  HDD:${machineConfig.plan.hdd}",
+        .clickable { onMachineClick(machine) }) {
+        Text(text = machine.machineName,style = MaterialTheme.typography.titleMedium, color = Color.White)
+        Text(text = machine.desc,style = MaterialTheme.typography.titleMedium, color = Color.White)
+        Text(text = "price: ${machine.price} per hour",style = MaterialTheme.typography.titleMedium, color = Color.White)
+        Text(text = "CPU:${machine.plan.cpuLimit}  GPU:${machine.plan.gpuLimit}  SSD:${machine.plan!!.ssd}  HDD:${machine.plan!!.hdd}",
             style = MaterialTheme.typography.titleMedium, color = Color.White
         )
         HorizontalDivider()
@@ -56,6 +58,6 @@ fun MachineCard(
 @Composable
 private fun UpgradeScreenPrev() {
     PriceComputeTheme {
-        UpgradeScreen()
+//        UpgradeScreen()
     }
 }

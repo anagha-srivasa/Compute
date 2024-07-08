@@ -1,13 +1,15 @@
 package com.example.pricecompute.screens.ai
 
-import java.util.UUID
+import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.PrimaryKey
+import org.mongodb.kbson.ObjectId
 
-enum class Participant{
-    USER , MODEL , ERROR
+
+
+class ChatMsg :RealmObject{
+    @PrimaryKey
+    var id: ObjectId = ObjectId()
+    var text: String = ""
+    var participant:Int = 0
+    var isPending: Boolean = false
 }
-data class ChatMessage(
-    val id:String = UUID.randomUUID().toString(),
-    val text:String = "",
-    val participant: Participant = Participant.USER,
-    var isPending:Boolean = false
-)

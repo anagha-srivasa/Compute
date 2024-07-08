@@ -1,4 +1,4 @@
-package com.example.pricecompute.screens
+package com.example.pricecompute.screens.ai
 
 import android.widget.Toast
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -15,7 +15,8 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -24,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -45,16 +47,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.pricecompute.provider.ComputeViewModel
-import com.example.pricecompute.screens.ai.ChatMessage
-import com.example.pricecompute.screens.ai.Participant
 import com.example.pricecompute.ui.theme.PriceComputeTheme
 import kotlinx.coroutines.launch
 
 @Composable
 fun ChatScreen(
-    viewModel: ComputeViewModel = viewModel()
+    viewModel: ComputeViewModel = viewModel(factory = ComputeViewModel.Factory)
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val chats by viewModel.chats.collectAsState()
     val listState = rememberLazyListState()
     val scope = rememberCoroutineScope()
 
@@ -77,7 +77,19 @@ fun ChatScreen(
                 .fillMaxSize()
 
         ){
-            ChatList(messageList = uiState.messages, listState =listState)
+            OutlinedButton(onClick = { viewModel.clearChat() }, modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)) {
+                Text(text = "Clear Chat", color = Color.White)
+            }
+            OutlinedButton(onClick = { viewModel.getNewMachine() }, modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)) {
+                Text(text = "Add machine", color = Color.White)
+            }
+            ChatList(messageList = chats, listState =listState)
         }
     }
 
@@ -85,7 +97,7 @@ fun ChatScreen(
 
 @Composable
 fun ChatList(
-    messageList:List<ChatMessage>,
+    messageList:List<ChatMsg>,
     listState: LazyListState
 ) {
     LazyColumn(
@@ -93,17 +105,17 @@ fun ChatList(
         reverseLayout = true
     ){
         items(messageList.reversed()){message->
-            ChatItem(chatMessage = message)
+            ChatItem(chatMsg = message)
         }
     }
 }
 
 @Composable
 fun ChatItem(
-    chatMessage: ChatMessage
+    chatMsg: ChatMsg
 ) {
-    val isModel = chatMessage.participant == Participant.MODEL ||
-            chatMessage.participant == Participant.ERROR
+    val isModel = chatMsg.participant == 1 ||
+            chatMsg.participant == 2
 
     val itemShape = if (isModel){
         RoundedCornerShape(4.dp,20.dp,20.dp,20.dp)
@@ -111,15 +123,19 @@ fun ChatItem(
         RoundedCornerShape(20.dp,4.dp,20.dp,20.dp)
     }
 
-    val bgColor = when(chatMessage.participant){
-        Participant.USER->{
-            Color(147, 34, 153)
+    val bgColor = when(chatMsg.participant){
+        0->{
+            Color(108, 157, 161)
         }
-        Participant.MODEL->{
-            Color(235, 146, 240)
+        1->{
+            Color(35, 233, 247)
         }
-        Participant.ERROR->{
+        2->{
             MaterialTheme.colorScheme.errorContainer
+        }
+
+        else -> {
+            MaterialTheme.colorScheme.inverseSurface
         }
     }
 
@@ -136,13 +152,13 @@ fun ChatItem(
         horizontalAlignment = horizontalAlignment
     ) {
         Text(
-            text = chatMessage.participant.name,
+            text = chatMsg.participant.toString(),
             style = MaterialTheme.typography.bodySmall,
             modifier = Modifier.padding(bottom = 4.dp)
         )
 
         Row {
-            if (chatMessage.isPending){
+            if (chatMsg.isPending){
                 CircularProgressIndicator(
                     modifier = Modifier
                         .padding(16.dp)
@@ -156,7 +172,7 @@ fun ChatItem(
                     modifier = Modifier.widthIn(0.dp,maxWidth*0.9f)
                 ) {
                     Text(
-                        text = chatMessage.text,
+                        text = chatMsg.text,
                         modifier = Modifier.padding(16.dp)
                     )
                 }
@@ -194,8 +210,8 @@ fun MessageInput(
                     capitalization = KeyboardCapitalization.Sentences,
                 ),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(235, 146, 240),
-                    focusedLabelColor = Color(235, 146, 240)
+                    focusedContainerColor = Color(108, 157, 161),
+                    focusedLabelColor = Color(108, 157, 161)
                 ),
                 modifier = Modifier
                     .align(Alignment.CenterVertically)
@@ -228,7 +244,7 @@ fun MessageInput(
                 )
             ) {
                 Icon(
-                    Icons.Filled.Send,
+                    Icons.AutoMirrored.Filled.Send,
                     contentDescription = "send",
                     modifier = Modifier
                 )

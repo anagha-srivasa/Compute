@@ -4,12 +4,12 @@ import androidx.compose.runtime.toMutableStateList
 
 
 class ChatUiState(
-    messages: List<ChatMessage> = emptyList()
+    messages: List<ChatMsg> = emptyList()
 ) {
-    private val _messages: MutableList<ChatMessage> = messages.toMutableStateList()
-    val messages: List<ChatMessage> = _messages
+    private val _messages: MutableList<ChatMsg> = messages.toMutableStateList()
+    val messages: List<ChatMsg> = _messages
 
-    fun addMessage(msg: ChatMessage) {
+    fun addMessage(msg: ChatMsg) {
         _messages.add(msg)
     }
 
